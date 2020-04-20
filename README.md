@@ -103,3 +103,28 @@ The rest of them work same as a non-privileged user
 
 * Passwords - Passwords are encrypted using sha256 encryption available in python library `passlib`
 * Webpages - Webpages other than *Home, Login and Signup* cannot be accessed by users if they are not authenticated, i.e. logged in.
+
+## Curl
+
+The project also uses cURL to implement PUT method to update a task. It, however, **does not** implement the same kind of security. The following command can be used from a terminal
+
+```
+curl -i -H "Content-Type: application/json" -X PUT -d '{"email": "", "desc": "", "status": ""}' http://<hostname>:5000/tasks/title=test
+
+```
+
+## Built with
+
+* [Python](https://www.python.org/downloads/) - Programming Language
+* [Flask](https://flask.palletsprojects.com/en/1.1.x/) - Python Web-Development Framework
+* [PyCharm](https://www.jetbrains.com/pycharm/download/) - IDE for Python
+* [Ubuntu 18.04 LTS](https://releases.ubuntu.com/18.04.4/) - Operating System
+
+## Acknowledgements
+
+* UK Police API - [License](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)
+* [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-add-authentication-to-your-app-with-flask-login) - To get an outline for the project
+
+## Authors
+
+**Yogen Parekh** - MSc Big Data Science, Queen Mary University of London
