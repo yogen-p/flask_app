@@ -37,6 +37,7 @@ pip install -r requirements.txt
     │   ├── index.html          # Display the homepage
     │   ├── base.html           # Basic design for all html files
     │   ├── todo.html           # Interface for ToDo 
+    │   ├── ...                 # Some more html files
     │   └── explore.html        # Interface for UK Police public API
     ├── app.py                  # Main file to launch app
     ├── exploring.py            # Backend for UK Police public API
