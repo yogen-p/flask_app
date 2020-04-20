@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="column is-4 is-offset-4">
+    <h3 class="title">Welcome, {{ current_user.name }}!</h3><br>
+    <h3 class="title">Explore Police API</h3>
+    <div class="box">
+        <ul>
+            <li><h4>Force Related</h4>
+            <ul style="list-style:disc">
+                <li><a href="{{ url_for('ex_path.force') }}">Specific forces</a></li></ul>
+            </li><br>
+            <li><h4>Crime Related</h4>
+            <ul style="list-style:disc">
+                <li><a href="{{ url_for('ex_path.crime') }}">Categorical Count</a></li></ul>
+            </li><br>
+            <li><h4>Neighbourhood Related</h4>
+            <ul style="list-style:disc">
+                <li><a href="{{ url_for('ex_path.neigh') }}">Neighbourhoods</a></li></ul>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
