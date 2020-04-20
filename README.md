@@ -125,6 +125,7 @@ curl -i -H "Content-Type: application/json" -X PUT -d '{"email": "", "desc": "",
 
 * UK Police API - [License](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)
 * [DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-add-authentication-to-your-app-with-flask-login) - To get an outline for the project
+* [Miguel Grinberg](https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask) - To get a demo of PUT request using cURL
 
 ## Authors
 
