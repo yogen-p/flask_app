@@ -76,26 +76,26 @@
 
                     <div id="navbarMenuHeroA" class="navbar-menu">
                         <div class="navbar-end topnav" id="myTopnav">
-                            <a href="{{ url_for('index') }}" class="navbar-item">
+                            <a href="{{ url_for('show_index') }}" class="navbar-item">
                                 Home
                             </a>
                             {% if current_user.is_authenticated %}
-                            <a href="{{ url_for('explore') }}" class="navbar-item">
+                            <a href="{{ url_for('show_explore') }}" class="navbar-item">
                                 Explore API
                             </a>
                             {% endif %}
                             {% if current_user.is_authenticated %}
-                            <a href="{{ url_for('td_demo.todo') }}" class="navbar-item">
+                            <a href="{{ url_for('td_demo.show_tasks') }}" class="navbar-item">
                                 Explore ToDo
                             </a>
                             {% endif %}
                             {% if not current_user.is_authenticated %}
-                            <a href="{{ url_for('login') }}" class="navbar-item">
+                            <a href="{{ url_for('show_login') }}" class="navbar-item">
                                 Login
                             </a>
                             {% endif %}
                             {% if current_user.email=="admin@b.com" or not current_user.is_authenticated %}
-                            <a href="{{ url_for('signup') }}" class="navbar-item">
+                            <a href="{{ url_for('show_signup') }}" class="navbar-item">
                                 Sign Up
                             </a>
                             {% endif %}
@@ -105,7 +105,7 @@
                             </a>
                             {% endif %}
                             {% if current_user.email=="admin@b.com" %}
-                            <a href="{{ url_for('delete') }}" class="navbar-item">
+                            <a href="{{ url_for('show_delete') }}" class="navbar-item">
                                 Delete User
                             </a>
                             {% endif %}

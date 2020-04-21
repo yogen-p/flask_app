@@ -1,5 +1,6 @@
 from flask import Blueprint, request, flash, redirect, url_for, jsonify, render_template
 from flask_login import current_user
+from responses import *
 import requests
 
 # Defining blueprint
@@ -8,17 +9,17 @@ ex_path = Blueprint('ex_path', __name__)
 
 # Displaying web page only
 @ex_path.route('/force', methods=['GET'])
-def force():
+def show_force():
     if current_user.is_authenticated:  # Check for valid user
         return render_template('force.html')
     else:
-        return render_template('login.html', response='401: Unauthorised, Please Login'), 401
+        return render_template('login.html', response=error_401), 401
 
 
 # If user requests information
 @ex_path.route('/force', methods=['POST'])
 def force_post():
-    name = request.form.get('name')  # Getting input and defining url
+    name = request.form.get('name').lower()  # Getting input and defining url
     url = 'https://data.police.uk/api/forces/{}'.format(name)
     # Make request to API and display response if ok
     try:
@@ -31,13 +32,16 @@ def force_post():
     except Exception:
         error = str(resp.status_code) + " " + resp.reason
         flash(error)
-    return redirect(url_for('ex_path.force'))
+    return redirect(url_for('ex_path.show_force'))
 
 
 # Display Crime API page
 @ex_path.route('/crime', methods=['GET'])
-def crime():
-    return render_template('crime.html')
+def show_crime():
+    if current_user.is_authenticated:  # Check for valid user
+        return render_template('crime.html')
+    else:
+        return render_template('login.html', response=error_401), 401
 
 
 # Requesting for Crime API
@@ -51,7 +55,7 @@ def crime_post():
     categorical = request.form.get('cats')
     if not all([lat, lng, date]):
         flash('All fields mandatory')
-        return redirect(url_for('ex_path.crime'))
+        return redirect(url_for('ex_path.show_crime'))
     else:  # Make request to API and display response if ok
         crime_url = crime_url_template.format(lat=lat, lng=lng, date=date)
         try:
@@ -70,14 +74,17 @@ def crime_post():
 
 # Display Neighbourhood page
 @ex_path.route('/neigh')
-def neigh():
-    return render_template('neigh.html')
+def show_neigh():
+    if current_user.is_authenticated:  # Check for valid user
+        return render_template('neigh.html')
+    else:
+        return render_template('login.html', response=error_401), 401
 
 
 # Request Neighbourhood API
 @ex_path.route('/neigh', methods=['POST'])
 def neigh_post():
-    name = request.form.get('name')
+    name = request.form.get('name').lower()
     url = 'https://data.police.uk/api/{}/neighbourhoods'.format(name)
     try:
         resp = requests.get(url)
@@ -89,7 +96,8 @@ def neigh_post():
     except Exception:
         error = str(resp.status_code) + " " + resp.reason
         flash(error)
-    return redirect(url_for('ex_path.neigh'))
+    return redirect(url_for('ex_path.show_neigh'))
+
 
 # If user requests for categorical count
 def categorical_data(date, resp):

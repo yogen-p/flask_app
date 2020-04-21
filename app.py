@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy  # 2.4.1
 from exploring import ex_path
 from tasks import td_demo
 from datetime import timedelta  # 4.3
+from responses import *
 import requests_cache
 import os
 
@@ -25,14 +26,14 @@ delta = timedelta(hours=2)
 
 # Index page
 @app.route('/')
-def index():
+def show_index():
     return render_template('index.html')
 
 # Showing login page
 @app.route('/login')
-def login():
+def show_login():
     if current_user.is_authenticated:  # Check if already logged in
-        return redirect(url_for('explore'))
+        return redirect(url_for('show_explore'))
     return render_template('login.html', response='')
 
 # Performing login
@@ -44,10 +45,10 @@ def login_post():
     user = User.query.filter_by(email=email).first()  # Checks user exists
     if not user or not sha256_crypt.verify(passwd, user.passwd):
         flash('Please check your credentials and try again.')
-        return redirect(url_for('login'))
+        return redirect(url_for('show_login'))
     # Login user if password matches
     login_user(user, remember=remember, duration=delta)
-    return redirect(url_for('explore'))
+    return redirect(url_for('show_explore'))
 
 # Loading user from database
 @login_manager.user_loader
@@ -56,7 +57,7 @@ def load_user(user_id):
 
 # Showing signup page
 @app.route('/signup')
-def signup():
+def show_signup():
     return render_template('signup.html')
 
 # Performing signup
@@ -66,31 +67,24 @@ def signup_post():
     email = request.form.get('email')
     passwd = request.form.get('password')
     # Check if user exists, try again if yes
-    check = User.query.filter_by(email=email).first()
-    if check:
-        flash('Email already exists')
-        return redirect(url_for('signup'))
-    # Add user with hashed password and redirect to login
-    user = User(name=name, email=email, passwd=sha256_crypt.encrypt(passwd))
-    db.session.add(user)
-    db.session.commit()
-    return redirect(url_for('login'))
+    if all([name, email, passwd]):
+        check = User.query.filter_by(email=email).first()
+        if check:
+            flash('Email already exists')
+            return redirect(url_for('signup')), 401
+        # Add user with hashed password and redirect to login
+        user = User(name=name, email=email, passwd=sha256_crypt.encrypt(passwd))
+        db.session.add(user)
+        db.session.commit()
+    return redirect(url_for('show_login')), 201
 
 # Exploring Police API
 @app.route('/explore', methods=['GET'])
-def explore():
+def show_explore():
     if current_user.is_authenticated:  # Check for valid user
         return render_template('explore.html')
     else:
-        return render_template('login.html', response='401: Unauthorised, Please Login'), 401
-
-# Exploring dynamic REST
-@app.route('/tasks', methods=['GET'])
-def tasks():
-    if current_user.is_authenticated:  # Check for valid user
-        return render_template('todo.html')
-    else:
-        return render_template('login.html', response='401: Unauthorised, Please Login'), 401
+        return render_template('login.html', response=error_401), 401
 
 # Logging out user
 @app.route('/logout')
@@ -99,11 +93,11 @@ def logout():
         logout_user()
         return render_template('index.html')
     else:  # Login if not logged in
-        return render_template('login.html', response='401: Unauthorised, Please Login'), 401
+        return render_template('login.html', response=error_401), 401
 
 # Showing Delete user page
 @app.route('/delete', methods=['GET'])
-def delete():
+def show_delete():
     return render_template('delete.html')
 
 # Performing Delete user
@@ -112,35 +106,39 @@ def delete_post():
     name = request.form.get('name')  # Getting input from form
     email = request.form.get('email')
     user = User.query.filter_by(name=name, email=email).first()
-    if all([name, email]) and user.email is email:  # Check for valid input
+    user_tasks = ToDo.query.filter_by(email=email).all()
+    print(all([name, email]))
+    if all([name, email, user]) and user.email == email:  # Check for valid input
         db.session.delete(user)
+        if user_tasks:
+            for ut in user_tasks:
+                db.session.delete(ut)
         db.session.commit()
-        return jsonify({'code': '204',
-                        'response': 'Deleted Successfully'}), 204
+        return jsonify(okay_200), 200
     else:
         flash('Invalid information!!!')
-    return redirect(url_for('delete'))
+        return redirect(url_for('show_delete'))
 
 # Displaying all usrs for admin
 @app.route('/all_users', methods=['GET'])
 def all_users():  # Check for admin
-    if current_user.is_authenticated and current_user.email=='admin@a.com':
+    if current_user.is_authenticated and current_user.email=='admin@b.com':
         cursor = User.query.all()
         users = [row.serialize() for row in cursor]  # Make sql row json compatible
         return jsonify({'users': users}), 200
     else:
-        return render_template('login.html', response='401: Unauthorised, Please Login'), 401
+        return render_template('login.html', response=error_401), 401
 
 # Filtering users by name for admin
 @app.route('/all_users/<name>', methods=['GET'])
 def all_users_name(name):  # Check for admin
-    if current_user.is_authenticated and current_user.email=='admin@a.com':
+    if current_user.is_authenticated and current_user.email=='admin@b.com':
         cursor = User.query.filter_by(name=name).all()
         users = [row.serialize() for row in cursor]  # Make sql row json compatible
         return jsonify({'code': '200',
                         'users': users}), 200
     else:
-        return render_template('login.html', response='401: Unauthorised, Please Login'), 401
+        return render_template('login.html', response=error_401), 401
 
 # Database Schema for user table
 class User(UserMixin, db.Model):
@@ -165,7 +163,8 @@ class ToDo(db.Model):
 
     # Making sql table row json compatible
     def serialize(self):
-        return {"title": self.title,
+        return {"email": self.email,
+                "title": self.title,
                 "desc": self.desc,
                 "status": self.status}
 

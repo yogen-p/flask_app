@@ -1,0 +1,6 @@
+flask>=
+flask_login>=0.5.0
+flask_sqlalchemy>=2.4.1
+passlib>=1.7.2
+requests>=2.23.0
+requests_cache>=0.5.2
