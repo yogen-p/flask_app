@@ -30,7 +30,7 @@ def show_index():
     return render_template('index.html')
 
 # Showing login page
-@app.route('/login')
+@app.route('/login', methods=['GET'])
 def show_login():
     if current_user.is_authenticated:  # Check if already logged in
         return redirect(url_for('show_explore'))
@@ -76,7 +76,7 @@ def signup_post():
         user = User(name=name, email=email, passwd=sha256_crypt.encrypt(passwd))
         db.session.add(user)
         db.session.commit()
-    return redirect(url_for('show_login')), 201
+    return redirect(url_for('show_login')), 302
 
 # Exploring Police API
 @app.route('/explore', methods=['GET'])
@@ -107,7 +107,6 @@ def delete_post():
     email = request.form.get('email')
     user = User.query.filter_by(name=name, email=email).first()
     user_tasks = ToDo.query.filter_by(email=email).all()
-    print(all([name, email]))
     if all([name, email, user]) and user.email == email:  # Check for valid input
         db.session.delete(user)
         if user_tasks:

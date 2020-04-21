@@ -60,8 +60,6 @@ def task_title(ttl):
 # Update task with PUT Request by using curl
 @td_demo.route('/tasks/title=<ttl>', methods=['PUT'])
 def task_put(ttl):
-    rep = request.json
-    print(rep)
     if not request.json:
         return jsonify(error_404), 404
     else:
@@ -69,12 +67,14 @@ def task_put(ttl):
         email = request.json['email']
         desc = request.json['desc']
         status = request.json['status']
-        print(title, desc, status)
         t_put = ToDo.query.filter_by(email=email, title=title).first()
-        t_put.desc = desc
-        t_put.status = status
-        db.session.commit()
-        return jsonify(okay_200), 200
+        if t_put:
+            t_put.desc = desc
+            t_put.status = status
+            db.session.commit()
+            return jsonify(okay_200), 200
+        else:
+            return jsonify(error_404), 404
 
 # Dislpay add task page
 @td_demo.route('/atask')
@@ -90,8 +90,9 @@ def atask_post():
     if current_user.is_authenticated:
         title = request.form.get('title')  # Get input from form
         desc = request.form.get('desc')
+        status = request.form.get('status')
         email = current_user.email
-        new_task = ToDo(email=email, title=title, desc=desc, status='False')  # Create task
+        new_task = ToDo(email=email, title=title, desc=desc, status=status)  # Create task
         db.session.add(new_task)  # Add task to database
         db.session.commit()
         return jsonify(cret_201), 201
