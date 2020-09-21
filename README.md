@@ -1,4 +1,4 @@
-# ECS781P Cloud Computing - Mini Project
+# REST API based Application
 This is a flask application which can be deployed using any cloud hosting service such as AWS, Google Cloud, etc. It focuses on REST APIs and their functionalities along with other capabilities. 
 
 ### UK Police Public API
